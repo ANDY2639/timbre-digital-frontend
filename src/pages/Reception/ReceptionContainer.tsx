@@ -1,10 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
-import socket from "../socket";
+import { useEffect, useMemo, useRef } from "react";
+import { useBase } from "../../context/base";
+import Reception from "./Reception";
+import socket from "../../socket";
 
-const ReceptionPage: React.FC = () => {
-  const [logs, setLogs] = useState<string[]>([]);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+const ReceptionContainer = () => {
+  const { logs, setLogs } = useBase();
   const userInteracted = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const logList = useMemo(() => logs.sort((a, b) => b.date.getTime() - a.date.getTime()), [logs]);
 
   // preparar audio cuando el usuario hace click por primera vez
   useEffect(() => {
@@ -32,9 +36,7 @@ const ReceptionPage: React.FC = () => {
   // escuchar socket
   useEffect(() => {
     socket.on("ring-event", (name: string) => {
-      const now = new Date();
-      const formattedDate = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-      setLogs((prev) => [...prev, `${name} tocó el timbre - ${formattedDate}`]);
+      setLogs((prevLogs) => [...prevLogs, { message: `${name} tocó el timbre`, date: new Date() }]);
 
       // reproducir sonido solo si ya fue "habilitado" por interacción
       if (audioRef.current) {
@@ -48,23 +50,11 @@ const ReceptionPage: React.FC = () => {
     return () => {
       socket.off("ring-event");
     };
+     
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">📡 Recepción</h1>
-      <p className="text-gray-500 mb-2">
-        Haz click en cualquier parte de la página para habilitar el timbre 🔔
-      </p>
-      <ul className="space-y-2">
-        {logs.map((log) => (
-          <li key={`log-${log}-${new Date().getTime()}`} className="bg-gray-200 p-2 rounded">
-            {log}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+  return <Reception logs={logList} />
+}
 
-export default ReceptionPage;
+export default ReceptionContainer

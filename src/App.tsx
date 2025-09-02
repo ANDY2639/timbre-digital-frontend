@@ -1,14 +1,14 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import RingPage from "./pages/RingPage";
-import ReceptionPage from "./pages/ReceptionPage";
+import Ring from "./pages/Ring";
+import Reception from "./pages/Reception";
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<RingPage />} />
-        <Route path="/reception" element={<ReceptionPage />} />
+        <Route path="/" element={<Ring />} />
+        <Route path="/reception" element={<Reception />} />
       </Routes>
     </BrowserRouter>
   );

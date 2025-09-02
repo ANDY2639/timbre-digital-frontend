@@ -1,6 +1,8 @@
 import { io } from "socket.io-client";
+import { config } from "./config";
 
-// URL del backend (puedes mover a .env en producción)
-const socket = io("http://localhost:3001");
+const socket = io(config.wsUrl, {
+  transports: ["websocket"],
+});
 
 export default socket;
